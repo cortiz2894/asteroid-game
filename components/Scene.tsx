@@ -6,6 +6,10 @@ import { useControls, Leva } from "leva";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { HandTracking } from "./HandTracking";
 import GameScene from "./GameScene";
+import { Effects } from "./Effects";
+import { MeshReflectorMaterial } from "@react-three/drei";
+import Grid from "./BackgroundGrid";
+import styles from "./Scene.module.scss";
 
 // types.ts
 export interface ShipType {
@@ -31,7 +35,10 @@ export default function Scene() {
 
   return (
     <section className="flex flex-col lg:flex-row gap-10 w-full h-screen">
-      <div className="w-full h-full relative" ref={containerRef}>
+      <div
+        className={`w-full h-full relative ${styles.background}`}
+        ref={containerRef}
+      >
         <div className="absolute top-4 left-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded">
           Score: {score}
         </div>
@@ -44,10 +51,27 @@ export default function Scene() {
             overflow: "hidden",
           }}
         >
+          <fog attach="fog" args={["#17171b", 30, 40]} />
+          <Grid />
           <ambientLight />
           <pointLight position={[10, 10, 10]} />
-          {/* <Effects /> */}
+          <Effects />
           <GameScene handPosition={handPosition} setScore={setScore} />
+          {/* <mesh position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[50, 50]} />
+            <MeshReflectorMaterial
+              blur={[400, 100]}
+              resolution={512}
+              mixBlur={1}
+              mixStrength={15}
+              depthScale={2}
+              minDepthThreshold={0.85}
+              color="#151515"
+              metalness={0}
+              roughness={1}
+              mirror={6}
+            />
+          </mesh> */}
         </Canvas>
       </div>
     </section>

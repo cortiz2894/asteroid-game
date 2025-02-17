@@ -4,19 +4,20 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, forwardRef, useImperativeHandle } from "react";
 import * as THREE from "three";
 
-interface ShipProps {
+interface AsteroidProps {
   position: [number, number, number];
   onDestroy: () => void;
+  size: number;
 }
 
-const Ship = forwardRef<THREE.Mesh, ShipProps>(
-  ({ position, onDestroy }, forwardedRef) => {
+const Asteroid = forwardRef<THREE.Mesh, AsteroidProps & { isPaused?: boolean }>(
+  ({ position, onDestroy, size, isPaused }, forwardedRef) => {
     const internalRef = useRef<THREE.Mesh>(null);
 
     useImperativeHandle(forwardedRef, () => internalRef.current!);
 
     useFrame((state, delta) => {
-      if (!internalRef.current) return;
+      if (isPaused! || !internalRef.current) return;
 
       internalRef.current.position.z += 5 * delta;
       if (internalRef.current.position.z >= 10) {
@@ -26,16 +27,16 @@ const Ship = forwardRef<THREE.Mesh, ShipProps>(
 
     return (
       <mesh ref={internalRef} position={position}>
-        <sphereGeometry args={[0.3, 16, 16]} />
+        <sphereGeometry args={[0.3, size, size]} />
         <meshStandardMaterial color="green" wireframe />
       </mesh>
     );
   }
 );
 
-Ship.displayName = "Ship";
+Asteroid.displayName = "Asteroid";
 
-export default Ship;
+export default Asteroid;
 
 // Ships move to the front camera
 // import type React from "react";
