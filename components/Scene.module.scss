@@ -1,8 +1,16 @@
 .background {
-  background: linear-gradient(
-    0deg,
-    rgb(10, 0, 20) 50%,
-    rgb(42, 8, 69) 72%,
-    rgb(74, 0, 130) 100%
-  );
+  &:before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: linear-gradient(
+      0deg,
+      rgb(10, 0, 20) 50%,
+      rgb(42, 8, 69) 72%,
+      rgb(74, 0, 130) 100%
+    );
+  }
 }

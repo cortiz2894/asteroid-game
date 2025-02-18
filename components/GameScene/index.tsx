@@ -133,7 +133,7 @@ function Cube({
   return (
     <mesh ref={cubeRef} position={position}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="hotpink" wireframe />
+      <meshStandardMaterial color="white" wireframe />
     </mesh>
   );
 }
@@ -303,7 +303,6 @@ const GameScene = ({ handPosition, setScore }: GameSceneProps) => {
 
   return (
     <>
-      {/* <NeonTunnel /> */}
       <Cube
         position={[-currentHandPosition.x * 3, currentHandPosition.y * 3, 0]}
         onShoot={handleShoot}

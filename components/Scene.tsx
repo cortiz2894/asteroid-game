@@ -14,14 +14,18 @@ import {
 import { HandTracking } from "./HandTracking";
 import GameScene from "./GameScene";
 import { Effects } from "./Effects";
-import { MeshReflectorMaterial } from "@react-three/drei";
-import Grid from "./BackgroundGrid";
 import styles from "./Scene.module.scss";
 import { EffectComposer, RenderPass, ShaderPass } from "three-stdlib";
 import { useLoader } from "@react-three/fiber";
 import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader";
 import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader";
 import * as THREE from "three";
+// types.ts
+export interface ShipType {
+  id: string;
+  position: [number, number, number];
+  speed: number;
+}
 
 // Extend Three.js classes to make them available in JSX
 extend({ EffectComposer, RenderPass, ShaderPass });
@@ -30,12 +34,14 @@ const TEXTURE_PATH =
   "https://res.cloudinary.com/dg5nsedzw/image/upload/v1641657168/blog/vaporwave-threejs-textures/grid.png";
 const DISPLACEMENT_PATH =
   "https://res.cloudinary.com/dg5nsedzw/image/upload/v1641657200/blog/vaporwave-threejs-textures/displacement.png";
+const METALNESS_PATH =
+  "https://res.cloudinary.com/dg5nsedzw/image/upload/v1641657200/blog/vaporwave-threejs-textures/metalness.png";
 
 function VaporwaveTerrain() {
-  const [gridTexture, displacementTexture] = useLoader(THREE.TextureLoader, [
-    TEXTURE_PATH,
-    DISPLACEMENT_PATH,
-  ]);
+  const [gridTexture, displacementTexture, metalnessTexture] = useLoader(
+    THREE.TextureLoader,
+    [TEXTURE_PATH, DISPLACEMENT_PATH, METALNESS_PATH]
+  );
   const meshRef = useRef<THREE.Mesh>();
   const meshRef2 = useRef<THREE.Mesh>();
 
@@ -49,11 +55,14 @@ function VaporwaveTerrain() {
     }
   });
 
-  const planeGeometry = new THREE.PlaneGeometry(2.8, 2.5, 24, 24);
+  const planeGeometry = new THREE.PlaneGeometry(2.8, 2.8, 24, 24);
   const planeMaterial = new THREE.MeshStandardMaterial({
     map: gridTexture,
     displacementMap: displacementTexture,
-    displacementScale: 0.4,
+    displacementScale: 1.4,
+    metalnessMap: metalnessTexture,
+    metalness: 0.96,
+    roughness: 0.5,
   });
 
   return (
@@ -77,11 +86,43 @@ function VaporwaveTerrain() {
     </>
   );
 }
-// types.ts
-export interface ShipType {
-  id: string;
-  position: [number, number, number];
-  speed: number;
+
+function Lights() {
+  const spotlightRef = useRef<THREE.SpotLight>();
+  const spotlight2Ref = useRef<THREE.SpotLight>();
+
+  useEffect(() => {
+    if (spotlightRef.current) {
+      spotlightRef.current.target.position.set(-0.25, 0.25, 0.25);
+    }
+    if (spotlight2Ref.current) {
+      spotlight2Ref.current.target.position.set(0.25, 0.25, 0.25);
+    }
+  }, []);
+
+  return (
+    <>
+      <ambientLight intensity={15} color="#ffffff" />
+      <spotLight
+        ref={spotlightRef}
+        color="#d53c3d"
+        intensity={550}
+        distance={30}
+        angle={Math.PI * 0.1}
+        penumbra={0.25}
+        position={[0.5, 2, 2.2]}
+      />
+      <spotLight
+        ref={spotlight2Ref}
+        color="#d53c3d"
+        intensity={550}
+        distance={30}
+        angle={Math.PI * 0.1}
+        penumbra={0.25}
+        position={[-0.5, 2, 2.2]}
+      />
+    </>
+  );
 }
 
 function PostProcessing() {
@@ -135,8 +176,8 @@ export default function Scene() {
   return (
     <section className="flex flex-col lg:flex-row gap-10 w-full h-screen">
       <div
-        // className={`w-full h-full relative ${styles.background}`}
-        className={`w-full h-full relative`}
+        className={`w-full h-full relative ${styles.background}`}
+        // className={`w-full h-full relative`}
         ref={containerRef}
       >
         <div className="absolute top-4 left-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded">
@@ -149,6 +190,7 @@ export default function Scene() {
             width: "100%",
             height: "100%",
             overflow: "hidden",
+            background: "transparent",
           }}
         >
           <ambientLight />
@@ -164,6 +206,8 @@ export default function Scene() {
             position: "absolute",
             zIndex: -1,
             top: 0,
+            background:
+              "linear-gradient(0deg, rgb(225 83 72) 30%, rgb(66 16 156) 100%)",
           }}
           camera={{
             fov: 75,
@@ -172,8 +216,8 @@ export default function Scene() {
             position: [positionX, positionY, positionZ],
           }}
         >
-          <fog attach="fog" args={["#000000", 1, 2.5]} />
-          <ambientLight intensity={10} />
+          <fog attach="fog" args={["#481c2b", 1, 2.5]} />
+          <Lights />
           <VaporwaveTerrain />
           <PostProcessing />
         </Canvas>
