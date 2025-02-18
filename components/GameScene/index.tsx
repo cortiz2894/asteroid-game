@@ -304,7 +304,11 @@ const GameScene = ({ handPosition, setScore }: GameSceneProps) => {
   return (
     <>
       <Cube
-        position={[-currentHandPosition.x * 3, currentHandPosition.y * 3, 0]}
+        position={[
+          -currentHandPosition.x * 4.5,
+          currentHandPosition.y * 3.5,
+          0,
+        ]}
         onShoot={handleShoot}
         crosshairPosition={crosshairPosition.current}
         isPaused={isPaused}

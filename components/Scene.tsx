@@ -47,11 +47,21 @@ function VaporwaveTerrain() {
 
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
-    if (meshRef.current) {
-      meshRef.current.position.z = (elapsedTime * 0.15) % 2;
-    }
-    if (meshRef2.current) {
-      meshRef2.current.position.z = ((elapsedTime * 0.15) % 2) - 2;
+    const speed = 0.15;
+    const planeLength = 2.8;
+
+    if (meshRef.current && meshRef2.current) {
+      meshRef.current.position.z = (elapsedTime * speed) % planeLength;
+      meshRef2.current.position.z =
+        ((elapsedTime * speed) % planeLength) - planeLength;
+
+      // Reset positions when they go out of view
+      if (meshRef.current.position.z >= planeLength) {
+        meshRef.current.position.z -= planeLength * 2;
+      }
+      if (meshRef2.current.position.z >= 0) {
+        meshRef2.current.position.z -= planeLength * 2;
+      }
     }
   });
 
@@ -71,7 +81,7 @@ function VaporwaveTerrain() {
         ref={meshRef}
         rotation-x={-Math.PI * 0.5}
         position-y={-0.2}
-        position-z={0.15}
+        position-z={0}
         geometry={planeGeometry}
         material={planeMaterial}
       />
@@ -79,7 +89,7 @@ function VaporwaveTerrain() {
         ref={meshRef2}
         rotation-x={-Math.PI * 0.5}
         position-y={-0.2}
-        position-z={-1.85}
+        position-z={-2.8}
         geometry={planeGeometry}
         material={planeMaterial}
       />
@@ -207,7 +217,9 @@ export default function Scene() {
             zIndex: -1,
             top: 0,
             background:
-              "linear-gradient(0deg, rgb(225 83 72) 30%, rgb(66 16 156) 100%)",
+              // "linear-gradient(0deg, rgb(225 83 72) 30%, rgb(66 16 156) 100%)",
+              // "linear-gradient(0deg, rgba(40,195,236,1) 0%, rgba(40,195,236,1) 32%, rgba(0,0,0,1) 93%, rgba(0,0,0,1) 100%)", // Bluish
+              "linear-gradient(0deg, rgb(242, 4, 97) 0%, rgb(208, 14, 107) 18%, rgb(19 18 40) 82%, rgb(11 19 38) 100%)",
           }}
           camera={{
             fov: 75,
@@ -216,7 +228,10 @@ export default function Scene() {
             position: [positionX, positionY, positionZ],
           }}
         >
-          <fog attach="fog" args={["#481c2b", 1, 2.5]} />
+          <fog attach="fog" args={["#9a0a4e", 1.3, 4.5]} />
+
+          {/* <fog attach="fog" args={["#2393b2", 1.3, 4.5]} /> // Bluish */}
+          {/* <fog attach="fog" args={["#481c2b", 1, 2.5]} /> */}
           <Lights />
           <VaporwaveTerrain />
           <PostProcessing />
